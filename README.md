@@ -55,6 +55,7 @@ lib/main.dart
 
 ## 🎯 หน้า Actions
 <img width="445" height="936" alt="Screenshot 2569-02-12 at 16 04 32" src="https://github.com/user-attachments/assets/77485c8a-04a1-4bb7-9d32-c2ef1fbe27da" />
+
 ### รายละเอียด
 
 แสดง widget ที่ใช้สำหรับโต้ตอบกับผู้ใช้ผ่านการกดปุ่ม
