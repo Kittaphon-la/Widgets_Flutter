@@ -10,8 +10,18 @@ class LabApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: "Material Lab",
+      debugShowCheckedModeBanner: false,
 
-      // ✅ Named Routing
+      theme: ThemeData(
+        colorSchemeSeed: Colors.indigo,
+        useMaterial3: true,
+       cardTheme: const CardThemeData(
+  elevation: 4,
+  margin: EdgeInsets.symmetric(vertical: 8),
+),
+      ),
+
       initialRoute: '/',
       routes: {
         '/': (_) => const MenuPage(),
@@ -27,38 +37,50 @@ class LabApp extends StatelessWidget {
 }
 
 //////////////////////////////////////////////////////////////
+// COMMON HEADER
+//////////////////////////////////////////////////////////////
+
+Widget pageWrapper(String title, Widget child) {
+  return Scaffold(
+    appBar: AppBar(title: Text(title)),
+    body: Padding(
+      padding: const EdgeInsets.all(16),
+      child: child,
+    ),
+  );
+}
+
+//////////////////////////////////////////////////////////////
 // MENU PAGE
 //////////////////////////////////////////////////////////////
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
 
-  Widget btn(BuildContext c, String t, String r) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: ElevatedButton(
-        onPressed: () => Navigator.pushNamed(c, r),
-        child: Text(t),
+  Widget menuBtn(BuildContext c, String t, String r, IconData icon) {
+    return Card(
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(t),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () => Navigator.pushNamed(c, r),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Material Widgets Lab")),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            btn(context,"Actions","/actions"),
-            btn(context,"Communication","/communication"),
-            btn(context,"Containment","/containment"),
-            btn(context,"Navigation Demo","/navigation"),
-            btn(context,"Selection","/selection"),
-            btn(context,"Text Inputs","/textinput"),
-          ],
-        ),
+    return pageWrapper(
+      "Material Widgets Lab",
+      ListView(
+        children: [
+          menuBtn(context,"Actions","/actions",Icons.touch_app),
+          menuBtn(context,"Communication","/communication",Icons.message),
+          menuBtn(context,"Containment","/containment",Icons.widgets),
+          menuBtn(context,"Navigation","/navigation",Icons.navigation),
+          menuBtn(context,"Selection","/selection",Icons.check_box),
+          menuBtn(context,"Text Inputs","/textinput",Icons.text_fields),
+        ],
       ),
     );
   }
@@ -71,18 +93,36 @@ class MenuPage extends StatelessWidget {
 class ActionsPage extends StatelessWidget {
   const ActionsPage({super.key});
 
+  void snack(BuildContext c,String m){
+    ScaffoldMessenger.of(c)
+        .showSnackBar(SnackBar(content: Text(m)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Actions Widgets")),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: ()=>snack(context,"FAB clicked"),
         child: const Icon(Icons.add),
       ),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {},
-          child: const Text("Elevated Button"),
+        child: Wrap(
+          spacing: 10,
+          children: [
+            ElevatedButton(
+              onPressed: ()=>snack(context,"Elevated"),
+              child: const Text("Elevated"),
+            ),
+            TextButton(
+              onPressed: ()=>snack(context,"TextButton"),
+              child: const Text("Text"),
+            ),
+            IconButton(
+              icon: const Icon(Icons.thumb_up),
+              onPressed: ()=>snack(context,"IconButton"),
+            ),
+          ],
         ),
       ),
     );
@@ -96,20 +136,40 @@ class ActionsPage extends StatelessWidget {
 class CommunicationPage extends StatelessWidget {
   const CommunicationPage({super.key});
 
-  void showSnack(BuildContext context){
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text("Hello Snackbar")));
+  void dialog(BuildContext c){
+    showDialog(
+      context: c,
+      builder: (_) => AlertDialog(
+        title: const Text("Dialog"),
+        content: const Text("This is communication widget"),
+        actions: [
+          TextButton(
+            onPressed: ()=>Navigator.pop(c),
+            child: const Text("Close"),
+          )
+        ],
+      ),
+    );
+  }
+
+  void snack(BuildContext c){
+    ScaffoldMessenger.of(c)
+        .showSnackBar(const SnackBar(content: Text("Hello SnackBar")));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Communication Widgets")),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () => showSnack(context),
-          child: const Text("Show Snackbar"),
-        ),
+    return pageWrapper(
+      "Communication Widgets",
+      Column(
+        children: [
+          ElevatedButton(
+              onPressed: ()=>dialog(context),
+              child: const Text("Show Dialog")),
+          ElevatedButton(
+              onPressed: ()=>snack(context),
+              child: const Text("Show SnackBar")),
+        ],
       ),
     );
   }
@@ -124,29 +184,36 @@ class ContainmentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Containment Widgets")),
-      body: Center(
-        child: Card(
-          elevation: 5,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.home),
-                Text("Card Example"),
-              ],
+    return pageWrapper(
+      "Containment Widgets",
+      ListView(
+        children: [
+
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text("Card Example"),
+              subtitle: const Text("Contain content"),
             ),
           ),
-        ),
+
+          ExpansionTile(
+            title: const Text("ExpansionTile"),
+            children: const [
+              Padding(
+                padding: EdgeInsets.all(12),
+                child: Text("Expandable content"),
+              )
+            ],
+          )
+        ],
       ),
     );
   }
 }
 
 //////////////////////////////////////////////////////////////
-// NAVIGATION DEMO
+// NAVIGATION
 //////////////////////////////////////////////////////////////
 
 class NavigationDemoPage extends StatelessWidget {
@@ -154,35 +221,26 @@ class NavigationDemoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Navigator Demo")),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-
-            // ✅ Using Navigator.push
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const SubPage(),
-                  ),
-                );
-              },
-              child: const Text("Open SubPage (Navigator.push)"),
-            ),
-
-            // ✅ Named route example
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/actions');
-              },
-              child: const Text("Open Actions (Named Route)"),
-            ),
-          ],
-        ),
+    return pageWrapper(
+      "Navigation Demo",
+      Column(
+        children: [
+          ElevatedButton(
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SubPage()),
+              );
+            },
+            child: const Text("Push Page"),
+          ),
+          ElevatedButton(
+            onPressed: (){
+              Navigator.pushNamed(context, '/actions');
+            },
+            child: const Text("Named Route"),
+          )
+        ],
       ),
     );
   }
@@ -193,12 +251,12 @@ class SubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Sub Page")),
-      body: Center(
+    return pageWrapper(
+      "Sub Page",
+      Center(
         child: ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Back"),
+          onPressed: ()=>Navigator.pop(context),
+          child: const Text("Go Back"),
         ),
       ),
     );
@@ -217,20 +275,36 @@ class SelectionPage extends StatefulWidget {
 }
 
 class _SelectionPageState extends State<SelectionPage> {
-  bool checked=false;
+  bool check=false;
+  bool sw=false;
+  int radio=0;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Selection Widgets")),
-      body: Center(
-        child: CheckboxListTile(
-          title: const Text("Select option"),
-          value: checked,
-          onChanged: (v){
-            setState(()=> checked=v!);
-          },
-        ),
+    return pageWrapper(
+      "Selection Widgets",
+      Column(
+        children: [
+
+          CheckboxListTile(
+            value: check,
+            title: const Text("Checkbox"),
+            onChanged: (v)=>setState(()=>check=v!),
+          ),
+
+          SwitchListTile(
+            value: sw,
+            title: const Text("Switch"),
+            onChanged: (v)=>setState(()=>sw=v),
+          ),
+
+          RadioListTile(
+            value: 1,
+            groupValue: radio,
+            title: const Text("Radio"),
+            onChanged: (v)=>setState(()=>radio=v!),
+          ),
+        ],
       ),
     );
   }
@@ -240,21 +314,51 @@ class _SelectionPageState extends State<SelectionPage> {
 // TEXT INPUT
 //////////////////////////////////////////////////////////////
 
-class TextInputPage extends StatelessWidget {
+class TextInputPage extends StatefulWidget {
   const TextInputPage({super.key});
 
   @override
+  State<TextInputPage> createState() => _TextInputPageState();
+}
+
+class _TextInputPageState extends State<TextInputPage> {
+  final controller = TextEditingController();
+  String output="";
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Text Input Widgets")),
-      body: const Padding(
-        padding: EdgeInsets.all(20),
-        child: TextField(
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: "Enter text",
+    return pageWrapper(
+      "Text Input Widgets",
+      Column(
+        children: [
+
+          TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              labelText: "Enter text",
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.edit),
+            ),
           ),
-        ),
+
+          const SizedBox(height: 12),
+
+          ElevatedButton(
+            onPressed: (){
+              setState(()=>output=controller.text);
+            },
+            child: const Text("Submit"),
+          ),
+
+          const SizedBox(height: 20),
+
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text("Output: $output"),
+            ),
+          )
+        ],
       ),
     );
   }
